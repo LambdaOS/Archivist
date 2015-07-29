@@ -8,22 +8,22 @@ typedef struct {
 } __attribute__((packed)) luuid_t;
 
 //Bits 7-6 of VariantAndClockSeqHigh
-#define LUUID_LOW_BITS ((uint64_t)2 << 62)
-#define LUUID_VARIANT_MASK ((uint64_t)3 << 62)
+#define LUUID_LOW_BITS ((uint64_t)0x2 << 62)
+#define LUUID_VARIANT_MASK ((uint64_t)0x3 << 62)
 //Variant 2, as specified by ISO/IEC 9834-8
 
 //Bits 15-11 of VersionAndTimeHigh
-#define LUUID_HIGH_BITS ((uint64_t)4 << 12)
-#define LUUID_VERSION_MASK ((uint64_t)F << 12)
+#define LUUID_HIGH_BITS ((uint64_t)0x4 << 12)
+#define LUUID_VERSION_MASK ((uint64_t)0xF << 12)
 //Version 4, "random-number-based UUID"
 
-luuid_t luuid_gen();
+luuid_t luuid_gen(void);
 
 static inline void luuid_enc(void *pp, luuid_t uuid)
 {
   uint8_t *p = (uint8_t *)pp;
-  le64enc(p, (uint64_t *)uuid.low);
-  le64enc(p + 8, (uint64_t *)uuid.high);
+  le64enc(p, uuid.low);
+  le64enc(p + 8, uuid.high);
 
   return;
 }
@@ -37,5 +37,11 @@ static inline luuid_t luuid_dec(const void *pp)
 static inline bool luuid_eq(luuid_t uuid1, luuid_t uuid2)
 {
   return uuid1.high == uuid2.high?uuid1.low == uuid2.low:false;
+}
+
+static inline bool luuid_valid(luuid_t uuid)
+{
+  return (((uuid.low & LUUID_VARIANT_MASK) == LUUID_LOW_BITS) &&
+	  ((uuid.high & LUUID_VERSION_MASK) == LUUID_HIGH_BITS));
 }
 #endif

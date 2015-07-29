@@ -1,7 +1,9 @@
 LIB=	archivist
 SHLIB_MAJOR= 1
-CFLAGS+=-Wall -std=c11 -I${.CURDIR}
-SRCS=	archivist.c luuid.c
+CSTD=   c11
+WARNS=  6
+CFLAGS+= -I${.CURDIR}
+SRCS=	uuid.c
 SUBDIR=	archivist
 MAN=	archivist.1
 

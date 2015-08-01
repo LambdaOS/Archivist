@@ -8,18 +8,18 @@ typedef uint32_t lflag_t;
 
 typedef uint32_t ltype_t;
 #define LT_DATUM     1
-#define LT_STRING    2
-#define LT_INTEGER   3
-#define LT_REFERENCE 4
-#define LT_CONS      5
-#define LT_TABLE     6
+#define LT_REFERENCE 2
+#define LT_CONS      3
+#define LT_TABLE     4
 
+typedef uint64_t ltime_t;
 typedef uint64_t lsize_t;
 
 typedef struct {
   luuid_t id;
   ltype_t type;
   lflag_t flags;
+  ltime_t timestamp;
   lsize_t revision;
   luuid_t ancestor;
   luuid_t parents_head;  // Head of list of parent objects

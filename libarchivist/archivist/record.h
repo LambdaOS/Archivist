@@ -3,30 +3,30 @@
 #include <stdint.h>
 #include "archivist/uuid.h"
 
-typedef uint8_t lflag_t;
-#define LF_TRACKING ((lflag_t)0x01)
+typedef uint8_t arch_flag_t;
+#define ARCH_FLAG_TRACKING ((arch_flag_t)0x01)
 
-typedef uint8_t ltype_t;
-#define LT_DATUM     ((ltype_t)1)
-#define LT_REFERENCE ((ltype_t)2)
-#define LT_CONS      ((ltype_t)3)
-#define LT_TABLE     ((ltype_t)4)
+typedef uint8_t arch_type_t;
+#define ARCH_TYPE_DATUM     ((arch_type_t)1)
+#define ARCH_TYPE_REFERENCE ((arch_type_t)2)
+#define ARCH_TYPE_CONS      ((arch_type_t)3)
+#define ARCH_TYPE_TABLE     ((arch_type_t)4)
 
-typedef uint64_t ltime_t;
-typedef uint64_t lsize_t;
+typedef uint64_t arch_time_t;
+typedef uint64_t arch_size_t;
 
 typedef struct {
-  luuid_t id;
-  ltime_t timestamp;
-  lsize_t revision;
-  luuid_t ancestor;
-  luuid_t parents_head;  // Head of list of parent objects
-  luuid_t refs_head;     // Head of list of tracking references
-  lsize_t size;
-  ltype_t type;
-  lflag_t flags;
+  arch_uuid_t id;
+  arch_time_t timestamp;
+  arch_size_t revision;
+  arch_uuid_t ancestor;
+  arch_uuid_t parents_head;  // Head of list of parent objects
+  arch_uuid_t refs_head;     // Head of list of tracking references
+  arch_size_t size;
+  arch_type_t type;
+  arch_flag_t flags;
   uint8_t width;
   uint8_t data[];
-} __attribute__((packed)) lrecord_t;
+} __attribute__((packed)) arch_record_t;
 // ^ Eww, compiler dependence. Guess it had to happen somewhere.
 #endif

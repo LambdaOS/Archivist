@@ -1,17 +1,17 @@
 #include <stdlib.h>
 #include "archivist/uuid.h"
 
-luuid_t luuid_gen()
+arch_uuid_t arch_uuid_gen()
 {
-  luuid_t uuid;
+  arch_uuid_t uuid;
 
   arc4random_buf(&uuid, sizeof(uuid));
   
-  uuid.low &= ~(LUUID_VARIANT_MASK);
-  uuid.low |= LUUID_LOW_BITS;
+  uuid.low &= ~(ARCH_UUID_VARIANT_MASK);
+  uuid.low |= ARCH_UUID_LOW_BITS;
   
-  uuid.high &= ~(LUUID_VERSION_MASK);
-  uuid.high |= LUUID_HIGH_BITS;
+  uuid.high &= ~(ARCH_UUID_VERSION_MASK);
+  uuid.high |= ARCH_UUID_HIGH_BITS;
 
   return uuid;
 }

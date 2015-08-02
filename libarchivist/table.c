@@ -1,4 +1,4 @@
-#include "archivist/hash.h"
+#include "archivist/table.h"
 
 // djb2 by Dan Bernstein
 lhash_t hash_string(const lrecord_t *string)

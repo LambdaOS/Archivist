@@ -1,5 +1,5 @@
 .include <bsd.own.mk>
-INCS=	 protocol.h uuid.h
+INCS=	 table.h record.h uuid.h
 INCSDIR= ${INCLUDEDIR}/archivist
 
 beforeinstall :

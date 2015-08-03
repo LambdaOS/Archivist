@@ -8,13 +8,13 @@ typedef struct {
 } __attribute__((packed)) arch_uuid_t;
 
 //Bits 7-6 of VariantAndClockSeqHigh
-#define ARCH_UUID_LOW_BITS ((uint64_t)0x2 << 62)
-#define ARCH_UUID_VARIANT_MASK ((uint64_t)0x3 << 62)
+#define ARCH_UUID_LOW_BITS ((uint64_t)0x2U << 62U)
+#define ARCH_UUID_VARIANT_MASK ((uint64_t)0x3U << 62U)
 //Variant 2, as specified by ISO/IEC 9834-8
 
 //Bits 15-11 of VersionAndTimeHigh
-#define ARCH_UUID_HIGH_BITS ((uint64_t)0x4 << 12)
-#define ARCH_UUID_VERSION_MASK ((uint64_t)0xF << 12)
+#define ARCH_UUID_HIGH_BITS ((uint64_t)0x4U << 12U)
+#define ARCH_UUID_VERSION_MASK ((uint64_t)0xFU << 12U)
 //Version 4, "random-number-based UUID"
 
 arch_uuid_t arch_uuid_gen(void);

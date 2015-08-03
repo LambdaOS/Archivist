@@ -1,7 +1,8 @@
+#include "archivist/record.h"
 #include "archivist/table.h"
 
 // FNV-1a
-arch_hash_t arch_hash(const lrecord_t *record)
+arch_hash_t arch_hash(const arch_record_t *record)
 {
   arch_hash_t hash = ARCH_FNV64_OFFSET_BASIS;
   
@@ -12,4 +13,3 @@ arch_hash_t arch_hash(const lrecord_t *record)
 
   return hash;
 }
-

@@ -1,5 +1,5 @@
-SUBDIR=  archivistd
-SUBDIR+= libarchivist
+SUBDIR=  libarchivist
+SUBDIR+= archivistd
 
 .include <bsd.subdir.mk>
 

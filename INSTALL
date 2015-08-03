@@ -1,0 +1,3 @@
+libarchivist must be built and installed before building the utilities
+in the bin directory. In both cases, building and installing are a
+matter of make && make install

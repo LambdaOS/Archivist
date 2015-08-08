@@ -30,5 +30,13 @@ typedef struct {
 } __attribute__((packed)) arch_record_t;
 // ^ Eww, compiler dependence. Guess it had to happen somewhere.
 
+static inline void *arch_record_elt(arch_record_t record, arch_size_t index)
+{
+  return (record->data + (record->width * index))
+}
+
+#define ARCH_CAR(record) ((arch_uuid_t)*arch_record_elt(record, 0))
+#define ARCH_CDR(record) ((arch_uuid_t)*arch_record_elt(record, 1))
+
 #define ARCH_IS(type_name, record) (record->type == ARCH_TYPE_##type_name)
 #endif

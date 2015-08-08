@@ -1,5 +1,5 @@
-#	@(#)Makefile	8.1 (Berkeley) 6/6/93
-# $FreeBSD: releng/10.1/usr.bin/wc/Makefile 201386 2010-01-02 10:27:05Z ed $
-
-PROG=	archivistd
+PROG= archivistd
+CSTD= c11
+WARNS= 6
+CFLAGS+= -I${.CURDIR}
 .include <bsd.prog.mk>

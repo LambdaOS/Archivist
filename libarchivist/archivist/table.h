@@ -12,5 +12,4 @@ typedef struct {
 #define ARCH_FNV64_OFFSET_BASIS ((arch_hash_t)14695981039346656037U)
 
 arch_hash_t arch_hash(const arch_record_t *record);
-arch_record_t arch_create_table(arch_record_t alist);
 #endif

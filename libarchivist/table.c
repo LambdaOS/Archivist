@@ -60,7 +60,7 @@ arch_record_t *arch_cache_get(arch_cache_t *cache, arch_uuid_t uuid)
 {
   size_t hash_mask = ARCH_HASH_MASK(cache->size);
 
-  while (hash_mask > ARCH_CACHE_MIN) {
+  while (hash_mask >= ARCH_CACHE_MIN) {
     arch_cache_bucket_t **slot = &cache->slots[arch_hash_uuid(uuid) & hash_mask];
     arch_cache_bucket_t *bucket = *slot;
     while(bucket) {

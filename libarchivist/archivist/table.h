@@ -14,7 +14,7 @@ typedef struct {
   arch_uuid_t key, value;
 } __attribute__((packed)) arch_slot_t;
 
-#define ARCH_CACHE_MIN 15
+#define ARCH_CACHE_MIN 31
 typedef struct arch_cache_bucket {
   arch_uuid_t uuid;
   arch_record_t *record;

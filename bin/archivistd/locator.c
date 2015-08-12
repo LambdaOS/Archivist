@@ -25,3 +25,22 @@ arch_size_t arch_locator_get(arch_locator_t *locator, arch_uuid_t uuid)
 }
 
 bool arch_locator_set(arch_locator_t *locator, arch_uuid_t uuid, arch_size_t offset)
+{
+  arch_size_t index = (arch_hash_uuid(uuid) & ARCH_HASH_MASK(locator->size));
+  if(!arch_uuid_null(locator->slots[index].uuid)) {
+    while(locator->slots[index].next) {
+      index = locator->slots[index].next;
+    }
+    arch_size_t collision_index = 0;
+    while(!arch_uuid_null(locator->slots[collision_index].uuid) && (collision_index < locator->size)) {
+      collision_index++;
+    }
+    if(collision_index == locator->size) {
+      return false;
+    } else {
+      locator->slots[index].next = collision_index;
+      index = collision_index;
+    }
+    locator-slots[index].uuid =;
+  }
+}

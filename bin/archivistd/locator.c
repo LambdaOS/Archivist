@@ -1,5 +1,6 @@
 #include "locator.h"
 
+// Dynamic resize method based on an idea by nortti of Freenode's #osdev-offtopic
 void _arch_locator_rehash(arch_locator_t *locator, arch_size_t index);
 
 arch_size_t arch_locator_get(arch_locator_t *locator, arch_uuid_t uuid)
@@ -41,6 +42,8 @@ bool arch_locator_set(arch_locator_t *locator, arch_uuid_t uuid, arch_size_t off
       locator->slots[index].next = collision_index;
       index = collision_index;
     }
-    locator-slots[index].uuid =;
   }
+  locator->slots[index] = { uuid, offset, NULL };
+
+  return true;
 }

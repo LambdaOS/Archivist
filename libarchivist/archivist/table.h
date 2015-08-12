@@ -21,7 +21,8 @@ typedef struct arch_cache_bucket {
   arch_cache_bucket *next;
 } arch_cache_bucket_t;
 
-typedef struct {
+typedef struct arch_cache {
+  struct arch_cache *old;
   size_t size, entries;
   arch_cache_bucket_t *slots[];
 } arch_cache_t;

@@ -1,4 +1,5 @@
-#include "locator.h"
+#include <string.h>
+#include "archivist/locator.h"
 
 typedef struct _arch_temp_bucket {
   arch_uuid_t uuid;
@@ -20,6 +21,7 @@ _arch_temp_bucket_t *_arch_locator_delete_chain(arch_locator_t *locator, arch_si
     bucket->offset = locator->slots[index].offset;
     bucket->next = _arch_locator_delete_chain(locator, locator->slots[index].next);
   }
+  memset(&locator->slots[index], 0, sizeof(arch_locator_bucket_t));
 
   return bucket;
 }
@@ -27,7 +29,17 @@ _arch_temp_bucket_t *_arch_locator_delete_chain(arch_locator_t *locator, arch_si
 // Dynamic resize method based on an idea by nortti of Freenode's #osdev-offtopic
 void _arch_locator_rehash(arch_locator_t *locator, arch_size_t index)
 {
-  
+  _arch_locator_temp_bucket_t *chain = _arch_locator_delete_chain(locator, index);
+
+  while(chain) {
+    _arch_locator_temp_bucket_t *temp;
+    arch_locator_set(locator, chain->uuid, chain->offset);
+    temp = chain->next;
+    free(chain);
+    chain = temp;
+  }
+
+  return;
 }
 
 arch_size_t arch_locator_get(arch_locator_t *locator, arch_uuid_t uuid)

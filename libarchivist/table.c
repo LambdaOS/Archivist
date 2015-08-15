@@ -104,7 +104,7 @@ bool arch_cache_set(arch_cache_t *cache, arch_record_t *record)
   if(!(bucket = malloc(sizeof(arch_bucket_t)))) {
     return false;
   }
-  bucket->uuid = record->uuid;
+  bucket->uuid = record->id;
   bucket->record = record;
 
   if(!_arch_cache_insert(cache, bucket)) {

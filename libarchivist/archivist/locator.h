@@ -1,8 +1,8 @@
 #ifndef ARCH_LOCATOR_H
 #define ARCH_LOCATOR_H 1
-#include <archivist/record.h>
-#include <archivist/uuid.h>
-#include <archivist/table.h>
+#include "record.h"
+#include "uuid.h"
+#include "table.h"
 
 #define ARCH_LOCATOR_MIN 255
 typedef struct {

@@ -1,10 +1,11 @@
 #include <errno.h>
 #include <stdlib.h>
+#include "archivist/uuid.h"
 #include "archivist/record.h"
 #include "archivist/table.h"
 
-void _arch_cache_rehash(arch_cache_t *new, arch_cache_bucket_t **slot);
-bool _arch_cache_insert(arch_cache_t *cache, arch_cache_bucket_t *bucket);
+static bool _arch_cache_insert(arch_cache_t *cache, arch_cache_bucket_t *bucket);
+static void _arch_cache_rehash(arch_cache_t *new, arch_cache_bucket_t **slot);
 
 // FNV-1a
 arch_hash_t arch_hash_octets(void *datum, size_t count)
@@ -35,13 +36,13 @@ static arch_cache_bucket_t **_arch_cache_get_slot(arch_cache_t *cache, arch_uuid
   return &cache->slots[arch_hash_uuid(uuid) & ARCH_HASH_MASK(cache->size)];
 }
 
-bool _arch_cache_insert(arch_cache_t *cache, arch_cache_bucket_t *bucket)
+static bool _arch_cache_insert(arch_cache_t *cache, arch_cache_bucket_t *bucket)
 {
-  arch_cache_bucket_t **slot = _arch_cache_get_slot(cache, bucket->uuid, ARCH_HASH_MASK(cache->size));
+  arch_cache_bucket_t **slot = _arch_cache_get_slot(cache, bucket->uuid);
 
-  if(*slot->uuid == bucket->uuid) {  // This does not check the entire chain!
-    errno = EEXIST;                  // This only gives you a little bit of safety against
-    return false;                    // inserting the same object twice in a row.
+  if(arch_uuid_eq((*slot)->uuid, bucket->uuid)) {  // This does not check the entire chain!
+    errno = EEXIST;                              // This only gives you a little bit of safety against
+    return false;                                // inserting the same object twice in a row.
   }
   
   bucket->next = *slot;
@@ -59,7 +60,7 @@ static void _arch_cache_rehash(arch_cache_t *new, arch_cache_bucket_t **slot)
 
   while(bucket) {
     arch_cache_bucket_t *next = bucket->next;
-    _arch_cache_insert(cache, bucket);
+    _arch_cache_insert(new, bucket);
     new->old->entries--;
     bucket = next;
   }
@@ -76,7 +77,7 @@ arch_record_t *arch_cache_get(arch_cache_t *cache, arch_uuid_t uuid)
 {
   arch_cache_bucket_t *bucket = *_arch_cache_get_slot(cache, uuid);
   while(bucket) {
-    if(bucket->uuid == uuid) {
+    if(arch_uuid_eq(bucket->uuid, uuid)) {
       return bucket->record;
     }
     bucket = bucket->next;
@@ -86,7 +87,7 @@ arch_record_t *arch_cache_get(arch_cache_t *cache, arch_uuid_t uuid)
     arch_cache_bucket_t **slot = _arch_cache_get_slot(cache->old, uuid);
     bucket = *slot;
     while(bucket) {
-      if(bucket->uuid == uuid) {
+      if(arch_uuid_eq(bucket->uuid, uuid)) {
 	_arch_cache_rehash(cache, slot);
 	return bucket->record;
       }
@@ -99,9 +100,9 @@ arch_record_t *arch_cache_get(arch_cache_t *cache, arch_uuid_t uuid)
 
 bool arch_cache_set(arch_cache_t *cache, arch_record_t *record)
 {
-  arch_bucket_t *bucket;
+  arch_cache_bucket_t *bucket;
 
-  if(!(bucket = malloc(sizeof(arch_bucket_t)))) {
+  if(!(bucket = malloc(sizeof(arch_cache_bucket_t)))) {
     return false;
   }
   bucket->uuid = record->id;

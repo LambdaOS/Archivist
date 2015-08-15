@@ -18,7 +18,7 @@ typedef struct {
 typedef struct arch_cache_bucket {
   arch_uuid_t uuid;
   arch_record_t *record;
-  arch_cache_bucket *next;
+  struct arch_cache_bucket *next;
 } arch_cache_bucket_t;
 
 typedef struct arch_cache {

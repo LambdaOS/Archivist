@@ -6,8 +6,7 @@
 typedef struct {
   uint64_t low, high;
 } __attribute__((packed)) arch_uuid_t;
-#define ARCH_UUID_NIL ((arch_uuid_t){ 0, 0 })
-#define ARCH_UUID_IS_NIL(uuid) ((bool)(uuid == ARCH_UUID_NIL))
+#define ARCH_UUID_IS_NIL(uuid) (!(uuid.high && uuid.low))
 
 //Bits 7-6 of VariantAndClockSeqHigh
 #define ARCH_UUID_LOW_BITS ((uint64_t)0x2U << 62U)

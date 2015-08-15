@@ -1,7 +1,34 @@
 #include "locator.h"
 
-// Dynamic resize method based on an idea by nortti of Freenode's #osdev-offtopic
+typedef struct _arch_temp_bucket {
+  arch_uuid_t uuid;
+  arch_size_t offset;
+  struct _arch_temp_bucket *next;
+} _arch_temp_bucket_t;
+
 void _arch_locator_rehash(arch_locator_t *locator, arch_size_t index);
+_arch_temp_bucket_t *_arch_locator_delete_chain(arch_locator_t *locator, arch_size_t index);
+
+_arch_temp_bucket_t *_arch_locator_delete_chain(arch_locator_t *locator, arch_size_t index)
+{
+  _arch_temp_bucket_t *bucket;
+  if(!index) {
+    return NULL;
+  }
+  if(bucket=malloc(sizeof(_arch_temp_bucket_t))) {
+    bucket->uuid = locator->slots[index].uuid;
+    bucket->offset = locator->slots[index].offset;
+    bucket->next = _arch_locator_delete_chain(locator, locator->slots[index].next);
+  }
+
+  return bucket;
+}
+
+// Dynamic resize method based on an idea by nortti of Freenode's #osdev-offtopic
+void _arch_locator_rehash(arch_locator_t *locator, arch_size_t index)
+{
+  
+}
 
 arch_size_t arch_locator_get(arch_locator_t *locator, arch_uuid_t uuid)
 {
@@ -44,6 +71,8 @@ bool arch_locator_set(arch_locator_t *locator, arch_uuid_t uuid, arch_size_t off
     }
   }
   locator->slots[index] = { uuid, offset, NULL };
+  locator->entries++;
 
   return true;
 }
+

@@ -30,6 +30,6 @@ typedef struct arch_cache {
 arch_hash_t arch_hash_octets(void *datum, size_t count);
 arch_hash_t arch_hash_record(arch_record_t *record);
 arch_hash_t arch_hash_uuid(arch_uuid_t uuid);
-void arch_cache_insert(arch_cache_t *cache, arch_cache_bucket_t *bucket)
 arch_record_t *arch_cache_get(arch_cache_t *cache, arch_uuid_t uuid);
+bool arch_cache_set(arch_cache_t *cache, arch_record_t *record);
 #endif

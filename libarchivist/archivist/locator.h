@@ -2,7 +2,6 @@
 #define ARCH_LOCATOR_H 1
 #include "record.h"
 #include "uuid.h"
-#include "table.h"
 
 #define ARCH_LOCATOR_MIN 255
 typedef struct {

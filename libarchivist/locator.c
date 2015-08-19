@@ -1,5 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
+#include "archivist/uuid.h"
+#include "archivist/record.h"
+#include "archivist/hash.h"
 #include "archivist/locator.h"
 
 typedef struct _arch_locator_temp_bucket {

@@ -30,18 +30,22 @@ typedef struct {
 } __attribute__((packed)) arch_record_t;
 // ^ Eww, compiler dependence. Guess it had to happen somewhere.
 
+typedef arch_record_t *(*arch_record_getter_t)(arch_uuid_t);
+
 static inline void *arch_record_elt(arch_record_t *record, arch_size_t index)
 {
   return (record->data + (record->width * index));
 }
 
+// Simplistic non-recursive equality check.
+// Also blindly truncates lengths to native size_t. You're welcome.
 static inline bool arch_record_eql(arch_record_t *record1, arch_record_t *record2)
 {
   return
     ((record1->size == record2->size) && (record2->size == record2->size))
     ?(!memcmp(record1->data,
 	      record2->data,
-	      (record1->width*record1->size)))
+	      (size_t)(record1->width*record1->size)))
     :false;
 }
 

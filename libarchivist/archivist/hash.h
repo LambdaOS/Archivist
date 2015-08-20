@@ -10,10 +10,6 @@
 
 typedef uint64_t arch_hash_t;
 
-typedef struct {
-  arch_uuid_t key, value;
-} __attribute__((packed)) arch_slot_t;
-
 arch_hash_t arch_hash_octets(void *datum, size_t count);
 arch_hash_t arch_hash_record(arch_record_t *record);
 arch_hash_t arch_hash_uuid(arch_uuid_t uuid);

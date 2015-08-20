@@ -1,9 +1,9 @@
+#include "archivist/cache.h"
 #include <errno.h>
 #include <stdlib.h>
 #include "archivist/uuid.h"
 #include "archivist/record.h"
 #include "archivist/hash.h"
-#include "archivist/cache.h"
 
 static bool _arch_cache_insert(arch_cache_t *cache, arch_cache_bucket_t *bucket);
 static void _arch_cache_rehash(arch_cache_t *new, arch_cache_bucket_t **slot);

@@ -35,6 +35,16 @@ static inline void *arch_record_elt(arch_record_t *record, arch_size_t index)
   return (record->data + (record->width * index));
 }
 
+static inline bool arch_record_eql(arch_record_t *record1, arch_record_t *record2)
+{
+  return
+    ((record1->size == record2->size) && (record2->size == record2->size))
+    ?(!memcmp(record1->data,
+	      record2->data,
+	      (record1->width*record1->size)))
+    :false;
+}
+
 #define ARCH_CAR(record) ((arch_uuid_t)*arch_record_elt(record, 0))
 #define ARCH_CDR(record) ((arch_uuid_t)*arch_record_elt(record, 1))
 

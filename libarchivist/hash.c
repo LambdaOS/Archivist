@@ -1,6 +1,6 @@
+#include "archivist/hash.h"
 #include "archivist/uuid.h"
 #include "archivist/record.h"
-#include "archivist/hash.h"
 
 // FNV-1a
 arch_hash_t arch_hash_octets(void *datum, size_t count)

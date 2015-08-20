@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include "archivist/uuid.h"
+#include <stdlib.h>
 
 arch_uuid_t arch_uuid_gen()
 {

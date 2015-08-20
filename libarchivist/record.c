@@ -1,7 +1,3 @@
-#include <stdio.h>
+#include "archivist/record.h"
 
-int say_hello()
-{
-  return printf("Hello, world.\n");
-}
 

@@ -12,7 +12,7 @@ typedef struct _arch_locator_temp_bucket {
 } _arch_locator_temp_bucket_t;
 
 #define _ARCH_LOCATOR_ERROR (_arch_locator_temp_bucket_t *)1
-void _arch_locator_rehash(arch_locator_t *locator, arch_size_t index);
+bool _arch_locator_rehash(arch_locator_t *locator, arch_size_t index);
 _arch_locator_temp_bucket_t *_arch_locator_delete_chain(arch_locator_t *locator, arch_size_t index);
 
 _arch_locator_temp_bucket_t *_arch_locator_delete_chain(arch_locator_t *locator, arch_size_t index)
@@ -22,30 +22,36 @@ _arch_locator_temp_bucket_t *_arch_locator_delete_chain(arch_locator_t *locator,
     return NULL;
   }
   if(!(bucket = malloc(sizeof(_arch_locator_temp_bucket_t)))) {
-    
+    return _ARCH_LOCATOR_ERROR;
   }
   bucket->uuid = locator->slots[index].uuid;
   bucket->offset = locator->slots[index].offset;
-  bucket->next = _arch_locator_delete_chain(locator, locator->slots[index].next);
+  if((bucket->next = _arch_locator_delete_chain(locator, locator->slots[index].next)) ==  _ARCH_LOCATOR_ERROR) {
+    free(bucket);
+    return _ARCH_LOCATOR_ERROR;
+  }
   memset(&locator->slots[index], 0, sizeof(arch_locator_bucket_t));
 
   return bucket;
 }
 
 // Dynamic resize method based on an idea by nortti of Freenode's #osdev-offtopic
-void _arch_locator_rehash(arch_locator_t *locator, arch_size_t index)
+bool _arch_locator_rehash(arch_locator_t *locator, arch_size_t index)
 {
-  _arch_locator_temp_bucket_t *chain = _arch_locator_delete_chain(locator, index);
+  _arch_locator_temp_bucket_t *chain;
+  if((chain = _arch_locator_delete_chain(locator, index)) == _ARCH_LOCATOR_ERROR) {
+    return false;
+  }
 
   while(chain) {
     _arch_locator_temp_bucket_t *temp;
-    arch_locator_set(locator, chain->uuid, chain->offset);
+    arch_locator_set(locator, chain->uuid, chain->offset); // We got here, so we've freed enough room. Ignore return value.
     temp = chain->next;
     free(chain);
     chain = temp;
   }
 
-  return;
+  return true;
 }
 
 arch_size_t arch_locator_get(arch_locator_t *locator, arch_uuid_t uuid)

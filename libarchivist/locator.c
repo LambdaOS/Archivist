@@ -11,6 +11,7 @@ typedef struct _arch_locator_temp_bucket {
   struct _arch_locator_temp_bucket *next;
 } _arch_locator_temp_bucket_t;
 
+#define _ARCH_LOCATOR_ERROR (_arch_locator_temp_bucket_t *)1
 void _arch_locator_rehash(arch_locator_t *locator, arch_size_t index);
 _arch_locator_temp_bucket_t *_arch_locator_delete_chain(arch_locator_t *locator, arch_size_t index);
 
@@ -20,11 +21,12 @@ _arch_locator_temp_bucket_t *_arch_locator_delete_chain(arch_locator_t *locator,
   if(!index) {
     return NULL;
   }
-  if((bucket = malloc(sizeof(_arch_locator_temp_bucket_t)))) {
-    bucket->uuid = locator->slots[index].uuid;
-    bucket->offset = locator->slots[index].offset;
-    bucket->next = _arch_locator_delete_chain(locator, locator->slots[index].next);
+  if(!(bucket = malloc(sizeof(_arch_locator_temp_bucket_t)))) {
+    
   }
+  bucket->uuid = locator->slots[index].uuid;
+  bucket->offset = locator->slots[index].offset;
+  bucket->next = _arch_locator_delete_chain(locator, locator->slots[index].next);
   memset(&locator->slots[index], 0, sizeof(arch_locator_bucket_t));
 
   return bucket;

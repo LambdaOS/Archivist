@@ -9,4 +9,5 @@ typedef struct arch_table_entry {
 } arch_table_entry_t;
 
 arch_record_t *arch_table_get(arch_record_getter_t getter, arch_record_t *key);
+bool *arch_table_set(arch_record_t *key, arch_record_t *value);
 #endif

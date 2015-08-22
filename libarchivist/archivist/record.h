@@ -7,6 +7,7 @@ typedef uint8_t arch_flag_t;
 #define ARCH_FLAG_TRACKING ((arch_flag_t)0x01U)
 
 typedef uint8_t arch_type_t;
+#define ARCH_TYPE_NIL       ((arch_type_t)0U)
 #define ARCH_TYPE_DATUM     ((arch_type_t)1U)
 #define ARCH_TYPE_REFERENCE ((arch_type_t)2U)
 #define ARCH_TYPE_CONS      ((arch_type_t)3U)
@@ -14,6 +15,7 @@ typedef uint8_t arch_type_t;
 
 typedef uint64_t arch_time_t;
 typedef uint64_t arch_size_t;
+#define ARCH_SIZE_MAX UINT64_MAX
 
 typedef struct {
   arch_uuid_t id;
@@ -29,6 +31,20 @@ typedef struct {
   uint8_t data[];
 } __attribute__((packed)) arch_record_t;
 // ^ Eww, compiler dependence. Guess it had to happen somewhere.
+
+arch_record_t arch_record_nil = {
+  ARCH_UUID_NIL,
+  0,
+  0,
+  ARCH_UUID_NIL,
+  ARCH_UUID_NIL,
+  ARCH_UUID_NIL,
+  1,
+  ARCH_TYPE_NIL,
+  0,
+  1,
+  { 0 }
+};
 
 typedef arch_record_t *(*arch_record_getter_t)(arch_uuid_t);
 

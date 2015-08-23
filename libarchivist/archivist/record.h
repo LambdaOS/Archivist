@@ -1,6 +1,7 @@
 #ifndef ARCHIVIST_H
 #define ARCHIVIST_H 1
 #include <stdint.h>
+#include <string.h>
 #include "uuid.h"
 
 typedef uint8_t arch_flag_t;
@@ -28,23 +29,11 @@ typedef struct {
   arch_type_t type;
   arch_flag_t flags;
   uint8_t width;
-  uint8_t data[];
+  uint8_t data[] __attribute__((align(sizeof(arch_size_t))));
 } __attribute__((packed)) arch_record_t;
 // ^ Eww, compiler dependence. Guess it had to happen somewhere.
 
-arch_record_t arch_record_nil = {
-  ARCH_UUID_NIL,
-  0,
-  0,
-  ARCH_UUID_NIL,
-  ARCH_UUID_NIL,
-  ARCH_UUID_NIL,
-  1,
-  ARCH_TYPE_NIL,
-  0,
-  1,
-  { 0 }
-};
+extern const arch_record_t arch_record_nil;
 
 typedef arch_record_t *(*arch_record_getter_t)(arch_uuid_t);
 
@@ -65,8 +54,8 @@ static inline bool arch_record_eql(arch_record_t *record1, arch_record_t *record
     :false;
 }
 
-#define ARCH_CAR(record) ((arch_uuid_t)*arch_record_elt(record, 0))
-#define ARCH_CDR(record) ((arch_uuid_t)*arch_record_elt(record, 1))
+#define ARCH_CAR(record) (*((arch_uuid_t *)arch_record_elt(record, 0)))
+#define ARCH_CDR(record) (*((arch_uuid_t *)arch_record_elt(record, 1)))
 
 #define ARCH_IS(type_name, record) (record->type == ARCH_TYPE_##type_name)
 #endif

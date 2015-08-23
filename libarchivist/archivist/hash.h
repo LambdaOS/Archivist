@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <stdint.h>
 #include "uuid.h"
+#include "record.h"
 
 #define ARCH_FNV64_PRIME ((arch_hash_t)1099511628211U)
 #define ARCH_FNV64_OFFSET_BASIS ((arch_hash_t)14695981039346656037U)

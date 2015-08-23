@@ -4,10 +4,15 @@
 #include "uuid.h"
 #include "record.h"
 
-typedef struct arch_table_entry {
+typedef struct {
   arch_uuid_t key, value;
   arch_size_t next;
 } arch_table_entry_t;
+
+typedef struct arch_table_proto_entry {
+  arch_record_t *key, *value;
+  struct arch_table_proto_entry *next;
+} arch_table_proto_entry_t;
 
 arch_record_t arch_table_record_inherit = {
   ARCH_UUID_NIL,
@@ -24,5 +29,5 @@ arch_record_t arch_table_record_inherit = {
 };
 
 arch_record_t *arch_table_get(arch_record_t *table, arch_record_t *key, arch_record_getter_t getter);
-bool arch_table_set(arch_record_t *key, arch_record_t *value);
+arch_record_t *arch_table_create(arch_table_proto_entry_t *entries);
 #endif

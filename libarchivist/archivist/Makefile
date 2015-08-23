@@ -1,5 +1,5 @@
 .include <bsd.own.mk>
-INCS=	 locator.h record.h hash.h cache.h uuid.h
+INCS=	 locator.h record.h hash.h cache.h uuid.h table.h
 INCSDIR= ${INCLUDEDIR}/archivist
 
 beforeinstall :

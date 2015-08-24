@@ -73,7 +73,7 @@ bool _arch_table_set(arch_record_t *table, arch_record_t *key, arch_record_t *va
   arch_table_entry_t *slot =
     arch_record_elt(table, arch_hash_record(key) & ARCH_HASH_MASK(table->size));
   if(!ARCH_UUID_IS_NIL(slot->key)) {
-    if(!arch_record_eql(key, getter(slot->key))) {
+    if(arch_record_eql(key, getter(slot->key))) {
       errno = EEXIST;
       return false;
     };
@@ -87,6 +87,7 @@ bool _arch_table_set(arch_record_t *table, arch_record_t *key, arch_record_t *va
       if(ARCH_UUID_IS_NIL(collision_slot->key)) {
 	slot->next = index;
 	slot = collision_slot;
+	break;
       }
     }
     if(index == table->size) {

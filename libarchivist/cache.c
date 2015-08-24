@@ -74,6 +74,7 @@ arch_record_t *arch_cache_get(arch_cache_t *cache, arch_uuid_t uuid)
     }
   }
 
+  errno = ENOENT;
   return NULL;
 }
 

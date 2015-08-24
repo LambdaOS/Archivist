@@ -25,7 +25,6 @@ const arch_record_t arch_table_record_inherit = {
 };
 
 arch_record_t *_arch_table_single_level_get(arch_record_t *table, arch_record_t *key, arch_record_getter_t getter);
-arch_size_t _arch_table_size(arch_size_t elements);
 bool _arch_table_set(arch_record_t *table, arch_record_t *key, arch_record_t *value, arch_record_getter_t getter);
 
 arch_record_t *_arch_table_single_level_get(arch_record_t *table, arch_record_t *key, arch_record_getter_t getter)
@@ -67,16 +66,6 @@ arch_record_t *arch_table_get(arch_record_t *table, arch_record_t *key, arch_rec
     lineages = getter(ARCH_CDR(lineages));
   }
   return (arch_record_t *)&arch_record_nil;
-}
-
-arch_size_t _arch_table_size(arch_size_t elements)
-{
-  arch_size_t index = 0;
-  for(arch_size_t work = elements >> 1; work; work >>= 1, index++);
-  if(elements > (1 << index)) {
-    index++;
-  }
-  return (1 << index);
 }
 
 bool _arch_table_set(arch_record_t *table, arch_record_t *key, arch_record_t *value, arch_record_getter_t getter)
@@ -121,7 +110,7 @@ arch_record_t *arch_table_create(arch_table_proto_entry_t *entries, bool trackin
   arch_size_t table_bytes =
     sizeof(arch_record_t)
     +sizeof(arch_table_entry_t)
-    *_arch_table_size(num_entries);
+    *arch_hash_size(num_entries);
   if(table_bytes > SIZE_MAX || !(table = malloc((size_t)table_bytes))) {
     return NULL;
   }

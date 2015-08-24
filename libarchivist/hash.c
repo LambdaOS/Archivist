@@ -2,6 +2,16 @@
 #include "archivist/uuid.h"
 #include "archivist/record.h"
 
+arch_size_t arch_hash_size(arch_size_t elements)
+{
+  arch_size_t index = 0;
+  for(arch_size_t work = elements >> 1; work; work >>= 1, index++);
+  if(elements > (1 << index)) {
+    index++;
+  }
+  return (1 << index);
+}
+
 // FNV-1a
 arch_hash_t arch_hash_octets(void *datum, size_t count)
 {

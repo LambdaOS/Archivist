@@ -48,7 +48,9 @@ arch_record_t *arch_table_get(arch_record_t *table, arch_record_t *key, arch_rec
   arch_record_t *lineages = getter(table->parents_head);
   arch_record_t *current_lineage = table;
   while(true) {
-    for(arch_record_t *current_revision = table; current_revision; getter(current_revision->ancestor)) {
+    for(arch_record_t *current_revision = table;
+	current_revision;
+	current_revision = getter(current_revision->ancestor)) {
       arch_record_t *value = _arch_table_single_level_get(current_revision, key, getter);
       if(value) {
 	if(ARCH_IS(NIL, value)) {

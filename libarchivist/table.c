@@ -112,6 +112,7 @@ arch_record_t *arch_table_create(arch_table_proto_entry_t *entries, bool trackin
     +sizeof(arch_table_entry_t)
     *arch_hash_size(num_entries);
   if(table_bytes > SIZE_MAX || !(table = malloc((size_t)table_bytes))) {
+    errno = ENOMEM;
     return NULL;
   }
   memset(table, 0, (size_t)table_bytes);

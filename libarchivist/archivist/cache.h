@@ -16,7 +16,7 @@ typedef struct arch_cache {
   arch_cache_bucket_t *slots[];
 } arch_cache_t;
 
-#define ARCH_CACHE_BYTES(elts) (sizeof(arch_cache_t) + sizeof(arch_cache_bucket_t) * elts)
+#define ARCH_CACHE_BYTES(elts) (sizeof(arch_cache_t) + sizeof(arch_cache_bucket_t *) * elts)
 
 arch_record_t *arch_cache_get(arch_cache_t *cache, arch_uuid_t uuid);
 bool arch_cache_set(arch_cache_t *cache, arch_record_t *record);

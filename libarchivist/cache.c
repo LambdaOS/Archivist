@@ -17,11 +17,13 @@ static bool _arch_cache_insert(arch_cache_t *cache, arch_cache_bucket_t *bucket)
 {
   arch_cache_bucket_t **slot = _arch_cache_get_slot(cache, bucket->uuid);
 
-  if(arch_uuid_eq((*slot)->uuid, bucket->uuid)) {  // This does not check the entire chain!
-    errno = EEXIST;                              // This only gives you a little bit of safety against
-    return false;                                // inserting the same object twice in a row.
+  if(*slot) {
+    if(arch_uuid_eq((*slot)->uuid, bucket->uuid)) {  // This does not check the entire chain!
+      errno = EEXIST;                              // This only gives you a little bit of safety against
+      return false;                                // inserting the same object twice in a row.
+    }
   }
-  
+
   bucket->next = *slot;
   *slot = bucket;
 

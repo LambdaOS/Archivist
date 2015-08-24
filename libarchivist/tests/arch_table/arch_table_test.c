@@ -139,6 +139,50 @@ int main(int argc, char *argv[]) {
     }
     printf("%lx%lx\n", record->id.high, record->id.low);
   }
+
+  arch_uuid_t old_table = table->id = arch_uuid_gen();
+  printf("Caching current table with ID %lx%lx: ", old_table.high, old_table.low);
+  if(!arch_cache_set(cache, table)) {
+    err(EX_SOFTWARE, "failed to cache table");
+  }
+  printf("OK\n");
+
+  printf("Assembling proto-entries for shadowing table\n");
+  for(int i = 0; j < VALUES; i++, j++) {
+    arch_table_proto_entry_t *entry;
+    if(!(entry = malloc(sizeof(arch_table_proto_entry_t)))) {
+      err(EX_UNAVAILABLE, "Unable to allocate table proto-entry");
+    }
+    entry->key = record_getter(keys[i]);
+    entry->value = record_getter(values[j]);
+    entry->next = entries;
+    entries = entry;
+    printf("Created proto-entry %lx%lx/%ld→%lx%lx\n", entry->key->id.high, entry->key->id.low, *(long *)arch_record_elt(entry->key, 0), entry->value->id.high, entry->value->id.low);
+  }
+  printf("Attempting to create table: ");
+  table = arch_table_create(entries, false, &record_getter);
+  if(!table) {
+    err(EX_SOFTWARE, "failed to create table");
+  }
+  printf("OK\n");
+  while(entries) {
+    arch_table_proto_entry_t *entry = entries;
+    entries = entry->next;
+    free(entry);
+  }
+  printf("Freed proto-entries.\n");
+
+  table->ancestor = old_table;
+
+  for(int i = 0; i < KEYS; i++) {
+    arch_record_t *record = record_getter(keys[i]);
+    printf("Getting value for key %lx%lx/%ld: ", record->id.high, record->id.low, *(long *)arch_record_elt(record, 0));
+    record = arch_table_get(table, record, &record_getter);
+    if(ARCH_UUID_IS_NIL(record->id)) {
+      errc(EX_SOFTWARE, ENOENT, "Failed to get value");
+    }
+    printf("%lx%lx\n", record->id.high, record->id.low);
+  }
   
   return 0;
 }

@@ -70,6 +70,30 @@ arch_record_t *arch_table_get(arch_record_t *table, arch_record_t *key, arch_rec
   return (arch_record_t *)&arch_record_nil;
 }
 
+arch_table_proto_entry_t *arch_table_proto_entry_create(arch_record_t *key, arch_record_t *value,
+							arch_table_proto_entry_t *next)
+{
+  arch_table_proto_entry_t *entry;
+  if(!(entry = malloc(sizeof(arch_table_proto_entry_t)))) {
+    return NULL;
+  }
+  entry->key = key;
+  entry->value = value;
+  entry->next = next;
+
+  return entry;
+}
+
+arch_table_proto_entry_t *arch_table_proto_destroy(arch_table_proto_entry_t *entries)
+{
+  while(entries) {
+    arch_table_proto_entry_t *entry = entries;
+    entries = entry->next;
+    free(entry);
+  }
+  return NULL;
+}
+
 bool _arch_table_set(arch_record_t *table, arch_record_t *key, arch_record_t *value, arch_record_getter_t getter)
 {
   arch_table_entry_t *slot =

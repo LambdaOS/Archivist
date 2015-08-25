@@ -98,14 +98,11 @@ int main(int argc, char *argv[]) {
   
   for(int i = 0; i < KEYS; i++, j++) {
     arch_table_proto_entry_t *entry;
-    if(!(entry = malloc(sizeof(arch_table_proto_entry_t)))) {
-      err(EX_UNAVAILABLE, "Unable to allocate table proto-entry");
+    if(!(entry = arch_table_proto_entry_create(record_getter(keys[i]), record_getter(values[j]), entries))) {
+      err(EX_UNAVAILABLE, "Unable to create table proto-entry");
     }
-    entry->key = record_getter(keys[i]);
-    entry->value = record_getter(values[j]);
-    entry->next = entries;
-    entries = entry;
     printf("Created proto-entry %lx%lx/%ld→%lx%lx\n", entry->key->id.high, entry->key->id.low, *(long *)arch_record_elt(entry->key, 0), entry->value->id.high, entry->value->id.low);
+    entries = entry;
   }
   printf("Attempting to create table: ");
   arch_record_t *table = arch_table_create(entries, false, &record_getter);
@@ -113,11 +110,8 @@ int main(int argc, char *argv[]) {
     err(EX_SOFTWARE, "failed to create table");
   }
   printf("OK\n");
-  while(entries) {
-    arch_table_proto_entry_t *entry = entries;
-    entries = entry->next;
-    free(entry);
-  }
+
+  entries = arch_table_proto_destroy(entries);
   printf("Freed proto-entries.\n");
 
   for(int i = 0; i < j; i++) {
@@ -140,26 +134,21 @@ int main(int argc, char *argv[]) {
   printf("Assembling proto-entries for shadowing table\n");
   for(int i = 0; j < VALUES; i++, j++) {
     arch_table_proto_entry_t *entry;
-    if(!(entry = malloc(sizeof(arch_table_proto_entry_t)))) {
-      err(EX_UNAVAILABLE, "Unable to allocate table proto-entry");
+    if(!(entry = arch_table_proto_entry_create(record_getter(keys[i]), record_getter(values[j]), entries))) {
+      err(EX_UNAVAILABLE, "Unable to create table proto-entry");
     }
-    entry->key = record_getter(keys[i]);
-    entry->value = record_getter(values[j]);
-    entry->next = entries;
-    entries = entry;
     printf("Created proto-entry %lx%lx/%ld→%lx%lx\n", entry->key->id.high, entry->key->id.low, *(long *)arch_record_elt(entry->key, 0), entry->value->id.high, entry->value->id.low);
+    entries = entry;
   }
+
   printf("Attempting to create table: ");
   table = arch_table_create(entries, false, &record_getter);
   if(!table) {
     err(EX_SOFTWARE, "failed to create table");
   }
   printf("OK\n");
-  while(entries) {
-    arch_table_proto_entry_t *entry = entries;
-    entries = entry->next;
-    free(entry);
-  }
+
+  entries = arch_table_proto_destroy(entries);
   printf("Freed proto-entries.\n");
 
   table->ancestor = old_table;

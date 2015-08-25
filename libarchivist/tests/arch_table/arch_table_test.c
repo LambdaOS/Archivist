@@ -21,22 +21,27 @@
 
 static arch_cache_t *cache;
 
-arch_record_t *make_random_int(void);
+arch_uuid_t make_random_int(void);
 arch_record_t *record_getter(arch_uuid_t uuid);
 
-arch_record_t *make_random_int(void)
+arch_uuid_t make_random_int(void)
 {
   arch_record_t *random_int;
   if(!(random_int=malloc(sizeof(arch_record_t) + sizeof(long)))) {
-    return NULL;
+    return ARCH_UUID_NIL;
   }
   memset(random_int, 0, sizeof(arch_record_t));
+  random_int->id = arch_uuid_gen();
   random_int->width = sizeof(long);
   random_int->size = 1;
   random_int->type = ARCH_TYPE_DATUM;
   *(long *)arch_record_elt(random_int, 0) = random();
 
-  return random_int;
+  if(!arch_cache_set(cache, random_int)) {
+    return ARCH_UUID_NIL;
+  }
+
+  return random_int->id;
 }
 
 arch_record_t *record_getter(arch_uuid_t uuid)
@@ -48,17 +53,6 @@ int main(int argc, char *argv[]) {
   arch_size_t cache_size = arch_hash_size(CACHE_ELTS);
   arch_uuid_t keys[KEYS], values[VALUES];
 
-  printf("Keys:\n");
-  for(int i = 0; i < KEYS; i++) {
-    keys[i] = arch_uuid_gen();
-    printf("%lx%lx\n", keys[i].high, keys[i].low);
-  }
-  printf("\nValues:\n");
-  for(int i = 0; i < VALUES; i++) {
-    values[i] = arch_uuid_gen();
-    printf("%lx%lx\n", values[i].high, values[i].low);
-  }
-
   if(!(cache=malloc(ARCH_CACHE_BYTES(cache_size)))) {
     err(EX_UNAVAILABLE, "failed to allocate cache");
   }
@@ -66,24 +60,20 @@ int main(int argc, char *argv[]) {
   cache->size = cache_size;
   printf("Cached:\n");
   printf("Keys:\n");
-  for(int i = 0; i < KEYS; i++) {
-    arch_record_t *key;
-    if(!(key = make_random_int()));
-    key->id = keys[i];
-    if(!arch_cache_set(cache, key)) {
-      err(EX_SOFTWARE, "Failed in arch_cache_set()");
+  for(unsigned int i = 0; i < KEYS; i++) {
+    keys[i] = make_random_int();
+    if(ARCH_UUID_IS_NIL(keys[i])) {
+      err(EX_SOFTWARE, "failed to create key %u", i);
     }
-    printf("UUID: %lx%lx Value: %ld\n", key->id.high, key->id.low, *(long *)arch_record_elt(key, 0));
+    printf("UUID: %lx%lx Value: %ld\n", keys[i].high, keys[i].low, *(long *)arch_record_elt(record_getter(keys[i]), 0));
   }
   printf("Values:\n");
-  for(int i = 0; i < VALUES; i++) {
-    arch_record_t *value;
-    if(!(value = make_random_int()));
-    value->id = values[i];
-    if(!arch_cache_set(cache, value)) {
-      err(EX_SOFTWARE, "Failed in arch_cache_set()");
+  for(unsigned int i = 0; i < VALUES; i++) {
+    values[i] = make_random_int();
+    if(ARCH_UUID_IS_NIL(values[i])) {
+      err(EX_SOFTWARE, "failed to create value %u", i);
     }
-    printf("UUID: %lx%lx Value: %ld\n", value->id.high, value->id.low, *(long *)arch_record_elt(value, 0));
+    printf("UUID: %lx%lx Value: %ld\n", values[i].high, values[i].low, *(long *)arch_record_elt(record_getter(values[i]), 0));
   }
 
   printf("Retrieved keys:\n");

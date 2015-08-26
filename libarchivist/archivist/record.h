@@ -23,8 +23,8 @@ typedef struct {
   arch_time_t timestamp;
   arch_size_t revision;
   arch_uuid_t ancestor;
-  arch_uuid_t parents_head;  // Head of list of parent objects
-  arch_uuid_t refs_head;     // Head of list of tracking references
+  arch_uuid_t parents;    // Head of list of parent objects
+  arch_uuid_t refs;       // Head of list of tracking references
   arch_size_t size;
   arch_type_t type;
   arch_flag_t flags;
@@ -54,8 +54,8 @@ static inline bool arch_record_eql(arch_record_t *record1, arch_record_t *record
     :false;
 }
 
-#define ARCH_CAR(record) (*((arch_uuid_t *)arch_record_elt(record, 0)))
-#define ARCH_CDR(record) (*((arch_uuid_t *)arch_record_elt(record, 1)))
+/* This is defined in a header for use by other modules in the library. It is not meant to be a client API */
+arch_record_t *_arch_record_init(arch_record_t *record, arch_uuid_t ancestor, arch_uuid_t parents, arch_record_getter_t getter);
 
 #define ARCH_IS(type_name, record) (record->type == ARCH_TYPE_##type_name)
 #endif

@@ -19,6 +19,7 @@ const arch_record_t arch_record_nil = {
 arch_record_t *_arch_record_init(arch_record_t *record, arch_uuid_t ancestor, arch_uuid_t parents, arch_record_getter_t getter)
 {
   memset(record, 0, sizeof(arch_record_t));
+  record->id = arch_uuid_gen();
   record->ancestor = ancestor;
   record->parents = parents;
   record->timestamp = (arch_time_t)time(NULL);

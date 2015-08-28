@@ -45,7 +45,7 @@ arch_record_t *_arch_table_single_level_get(arch_record_t *table, arch_record_t 
 
 arch_record_t *arch_table_get(arch_record_t *table, arch_record_t *key, arch_record_getter_t getter)
 {
-  arch_record_t *lineages = getter(table->parents_head);
+  arch_list_iterator_t *lineages = arch_list_iterator(getter(table->parents_head), getter);
   arch_record_t *current_lineage = table;
   while(true) {
     for(arch_record_t *current_revision = table;
@@ -61,11 +61,13 @@ arch_record_t *arch_table_get(arch_record_t *table, arch_record_t *key, arch_rec
 	return value;
       }
     }
-    if(ARCH_IS(NIL, lineages)) {
+    if(!(current_lineage = arch_list_iterate(lineages))) {
+      errno = EINVAL;
+      return NULL;
+    }
+    if(ARCH_IS(NIL, current_lineage)) {
       break;
     }
-    current_lineage = getter(ARCH_CAR(lineages));
-    lineages = getter(ARCH_CDR(lineages));
   }
   return (arch_record_t *)&arch_record_nil;
 }

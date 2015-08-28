@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
     printf("Getting value for key %lx%lx/%ld: ", record->id.high, record->id.low, *(long *)arch_record_elt(record, 0));
     record = arch_table_get(table, record, &record_getter);
     if(ARCH_UUID_IS_NIL(record->id)) {
-      errc(EX_SOFTWARE, ENOENT, "Failed to get value");
+      err(EX_SOFTWARE, "Failed to get value");
     }
     printf("%lx%lx\n", record->id.high, record->id.low);
   }
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
     printf("Getting value for key %lx%lx/%ld: ", record->id.high, record->id.low, *(long *)arch_record_elt(record, 0));
     record = arch_table_get(table, record, &record_getter);
     if(ARCH_UUID_IS_NIL(record->id)) {
-      errc(EX_SOFTWARE, ENOENT, "Failed to get value");
+      err(EX_SOFTWARE, "Failed to get value");
     }
     printf("%lx%lx\n", record->id.high, record->id.low);
   }

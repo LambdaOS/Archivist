@@ -24,9 +24,9 @@ arch_record_t *_arch_record_init(arch_record_t *record, arch_uuid_t ancestor, ar
   record->parents = parents;
   record->timestamp = (arch_time_t)time(NULL);
   if(!ARCH_UUID_IS_NIL(ancestor)) {
-    arch_record_t *ancestor = getter(ancestor);
-    if(!ARCH_IS(NIL, ancestor)) {
-      record->revision = ancestor->revision + 1;
+    arch_record_t *ancestor_record = getter(ancestor);
+    if(!ARCH_IS(NIL, getter(ancestor))) {
+      record->revision = ancestor_record->revision + 1;
     }
   }
 

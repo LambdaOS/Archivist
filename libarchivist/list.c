@@ -10,7 +10,7 @@ arch_record_t *arch_cons_init(arch_record_t *record, arch_uuid_t car, arch_uuid_
   record->width = sizeof(arch_uuid_t);
   record->size = 2;
   ARCH_CAR(record) = car;
-  ARCD_CDR(record) = cdr;
+  ARCH_CDR(record) = cdr;
   return record;
 }
 
@@ -32,8 +32,8 @@ arch_record_t *arch_list_iterate(arch_list_iterator_t *iterator)
 {
   arch_record_t *current = iterator->current;
   if(ARCH_IS(CONS, current)) {
-    iterator->current = iterator->getter(CDR(current));
-    return getter(CAR(current));
+    iterator->current = iterator->getter(ARCH_CDR(current));
+    return iterator->getter(ARCH_CAR(current));
   }
   if(ARCH_IS(NIL, current)) {
     iterator->current = iterator->head;

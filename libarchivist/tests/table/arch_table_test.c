@@ -13,10 +13,11 @@
 #include <archivist/record.h>
 #include <archivist/cache.h>
 #include <archivist/hash.h>
+#include <archivist/list.h>
 #include <archivist/table.h>
 
 #define KEYS 4
-#define VALUES 6
+#define VALUES 9
 #define CACHE_ELTS (KEYS + VALUES)
 
 static arch_cache_t *cache;
@@ -45,12 +46,17 @@ arch_uuid_t make_random_int(void)
 
 arch_record_t *record_getter(arch_uuid_t uuid)
 {
-  return arch_cache_get(cache, uuid);
+  if(ARCH_UUID_IS_NIL(uuid)) {
+    return (arch_record_t *)&arch_record_nil;
+  }
+  arch_record_t *record = arch_cache_get(cache, uuid);
+  return record;
 }
 
 int main(int argc, char *argv[]) {
   arch_uuid_t keys[KEYS], values[VALUES];
 
+  printf("%lx\n", (uint64_t)&arch_record_nil);
   if(!(cache = arch_cache_create(CACHE_ELTS))) {
     err(EX_UNAVAILABLE, "failed to allocate cache");
   }
@@ -110,7 +116,7 @@ int main(int argc, char *argv[]) {
   entries = arch_table_proto_destroy(entries);
   printf("Freed proto-entries.\n");
 
-  for(int i = 0; i < j; i++) {
+  for(int i = 0; i < KEYS; i++) {
     arch_record_t *record = record_getter(keys[i]);
     printf("Getting value for key %lx%lx/%ld: ", record->id.high, record->id.low, *(long *)arch_record_elt(record, 0));
     record = arch_table_get(table, record, &record_getter);
@@ -128,7 +134,7 @@ int main(int argc, char *argv[]) {
   printf("OK\n");
 
   printf("Assembling proto-entries for shadowing table\n");
-  for(int i = 0; j < VALUES; i++, j++) {
+  for(int i = 0; j < (VALUES - 3); i++, j++) {
     arch_table_proto_entry_t *entry;
     if(!(entry = arch_table_proto_entry_create(record_getter(keys[i]), record_getter(values[j]), entries))) {
       err(EX_UNAVAILABLE, "Unable to create table proto-entry");
@@ -156,6 +162,57 @@ int main(int argc, char *argv[]) {
     }
     printf("%lx%lx\n", record->id.high, record->id.low);
   }
-  
+
+  old_table = table->id = arch_uuid_gen();
+  printf("Caching current table with ID %lx%lx: ", old_table.high, old_table.low);
+  if(!arch_cache_set(cache, table)) {
+    err(EX_SOFTWARE, "failed to cache table");
+  }
+  printf("OK\n");
+
+  arch_record_t *parents;
+  printf("Creating parents list cons\n");
+  if(!(parents = malloc(ARCH_CONS_BYTES))) {
+    err(EX_UNAVAILABLE, "Unable to create cons");
+  }
+  parents = arch_cons_init(parents, old_table, ARCH_UUID_NIL, false, ARCH_UUID_NIL, &record_getter);
+  printf("Cons UUID: %lx%lx\n", parents->id.high, parents->id.low);
+  printf("Cons car: %lx%lx\n", ARCH_CAR(parents).high, ARCH_CAR(parents).low);
+  printf("Cons cdr: %lx%lx\n", ARCH_CDR(parents).high, ARCH_CDR(parents).low);
+  printf("Caching parents list cons\n");
+  if(!arch_cache_set(cache, parents)) {
+    err(EX_UNAVAILABLE, "Unable to cache cons");
+  }
+
+  printf("Assembling proto-entries for inheriting table\n");
+  for(int i = 0; j < VALUES; i++, j++) {
+    arch_table_proto_entry_t *entry;
+    if(!(entry = arch_table_proto_entry_create(record_getter(keys[i]), record_getter(values[j]), entries))) {
+      err(EX_UNAVAILABLE, "Unable to create table proto-entry");
+    }
+    printf("Created proto-entry %lx%lx/%ld→%lx%lx\n", entry->key->id.high, entry->key->id.low, *(long *)arch_record_elt(entry->key, 0), entry->value->id.high, entry->value->id.low);
+    entries = entry;
+  }
+
+  printf("Attempting to create table: ");
+  table = arch_table_create(entries, false, ARCH_UUID_NIL, parents->id, &record_getter);
+  if(!table) {
+    err(EX_SOFTWARE, "failed to create table");
+  }
+  printf("OK\n");
+
+  entries = arch_table_proto_destroy(entries);
+  printf("Freed proto-entries.\n");
+
+  for(int i = 0; i < KEYS; i++) {
+    arch_record_t *record = record_getter(keys[i]);
+    printf("Getting value for key %lx%lx/%ld: ", record->id.high, record->id.low, *(long *)arch_record_elt(record, 0));
+    record = arch_table_get(table, record, &record_getter);
+    if(ARCH_UUID_IS_NIL(record->id)) {
+      err(EX_SOFTWARE, "Failed to get value");
+    }
+    printf("%lx%lx\n", record->id.high, record->id.low);
+  }
+
   return 0;
 }

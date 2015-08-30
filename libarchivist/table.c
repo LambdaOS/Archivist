@@ -46,11 +46,16 @@ arch_record_t *_arch_table_single_level_get(arch_record_t *table, arch_record_t 
 
 arch_record_t *arch_table_get(arch_record_t *table, arch_record_t *key, arch_record_getter_t getter)
 {
+  if(!ARCH_IS(TABLE, table)) {
+    errno = EINVAL;
+    return NULL;
+  }
+
   arch_list_iterator_t *lineages = arch_list_iterator(getter(table->parents), getter);
   arch_record_t *current_lineage = table;
   while(true) {
-    for(arch_record_t *current_revision = table;
-	current_revision;
+    for(arch_record_t *current_revision = current_lineage;
+	!ARCH_IS(NIL, current_revision);
 	current_revision = getter(current_revision->ancestor)) {
       arch_record_t *value = _arch_table_single_level_get(current_revision, key, getter);
       if(value) {
@@ -139,7 +144,7 @@ arch_record_t *arch_table_create(arch_table_proto_entry_t *entries, bool trackin
 
   arch_record_t *table = NULL;
   arch_size_t table_bytes = sizeof(arch_table_entry_t) * arch_hash_size(num_entries);
-  if(table_bytes > SIZE_MAX || !(table = malloc((size_t)table_bytes))) {
+  if(table_bytes > SIZE_MAX || !(table = malloc(sizeof(arch_record_t) + (size_t)table_bytes))) {
     errno = ENOMEM;
     return NULL;
   }

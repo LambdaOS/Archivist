@@ -49,14 +49,11 @@ arch_record_t *record_getter(arch_uuid_t uuid)
 }
 
 int main(int argc, char *argv[]) {
-  arch_size_t cache_size = arch_hash_size(CACHE_ELTS);
   arch_uuid_t keys[KEYS], values[VALUES];
 
-  if(!(cache=malloc(ARCH_CACHE_BYTES(cache_size)))) {
+  if(!(cache = arch_cache_create(CACHE_ELTS))) {
     err(EX_UNAVAILABLE, "failed to allocate cache");
   }
-  memset(cache, 0, ARCH_CACHE_BYTES(cache_size));
-  cache->size = cache_size;
   printf("Cached:\n");
   printf("Keys:\n");
   for(unsigned int i = 0; i < KEYS; i++) {

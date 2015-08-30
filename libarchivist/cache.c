@@ -1,5 +1,6 @@
 #include "archivist/cache.h"
 #include <errno.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include "archivist/uuid.h"
 #include "archivist/record.h"
@@ -7,6 +8,22 @@
 
 static bool _arch_cache_insert(arch_cache_t *cache, arch_cache_bucket_t *bucket);
 static void _arch_cache_rehash(arch_cache_t *new, arch_cache_bucket_t **slot);
+
+arch_cache_t *arch_cache_create(arch_size_t elts)
+{
+  arch_size_t size = arch_hash_size(elts);
+  arch_size_t bytes = sizeof(arch_cache_t) + sizeof(arch_cache_bucket_t *) * size;
+  arch_cache_t *cache;
+  
+  if(bytes > SIZE_MAX || !(cache = malloc((size_t)bytes))) {
+    errno = ENOMEM;
+    return NULL;
+  }
+  memset(cache, 0, bytes);
+  cache->size = size;
+
+  return cache;
+}
 
 static arch_cache_bucket_t **_arch_cache_get_slot(arch_cache_t *cache, arch_uuid_t uuid)
 {

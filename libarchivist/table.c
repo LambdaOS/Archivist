@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "archivist/hash.h"
+#include "archivist/list.h"
 #include "archivist/uuid.h"
 #include "archivist/record.h"
 
@@ -45,7 +46,7 @@ arch_record_t *_arch_table_single_level_get(arch_record_t *table, arch_record_t 
 
 arch_record_t *arch_table_get(arch_record_t *table, arch_record_t *key, arch_record_getter_t getter)
 {
-  arch_list_iterator_t *lineages = arch_list_iterator(getter(table->parents_head), getter);
+  arch_list_iterator_t *lineages = arch_list_iterator(getter(table->parents), getter);
   arch_record_t *current_lineage = table;
   while(true) {
     for(arch_record_t *current_revision = table;
@@ -130,22 +131,21 @@ bool _arch_table_set(arch_record_t *table, arch_record_t *key, arch_record_t *va
   return true;
 }
 
-arch_record_t *arch_table_create(arch_table_proto_entry_t *entries, bool tracking, arch_record_getter_t getter)
+arch_record_t *arch_table_create(arch_table_proto_entry_t *entries, bool tracking,
+				 arch_uuid_t ancestor, arch_uuid_t parents, arch_record_getter_t getter)
 {
   arch_size_t num_entries = 0;
   for(arch_table_proto_entry_t *entry = entries; entry; entry = entry->next, num_entries++);
 
   arch_record_t *table = NULL;
-  arch_size_t table_bytes =
-    sizeof(arch_record_t)
-    +sizeof(arch_table_entry_t)
-    *arch_hash_size(num_entries);
+  arch_size_t table_bytes = sizeof(arch_table_entry_t) * arch_hash_size(num_entries);
   if(table_bytes > SIZE_MAX || !(table = malloc((size_t)table_bytes))) {
     errno = ENOMEM;
     return NULL;
   }
-  memset(table, 0, (size_t)table_bytes);
-  table->size = num_entries;
+  _arch_record_init(table, ancestor, parents, getter);
+  memset(table->data, 0, (size_t)table_bytes);
+  table->size = arch_hash_size(num_entries);
   table->type = ARCH_TYPE_TABLE;
   table->width = sizeof(arch_table_entry_t);
   if(tracking) table->flags = ARCH_FLAG_TRACKING;

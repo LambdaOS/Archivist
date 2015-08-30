@@ -30,8 +30,7 @@ arch_uuid_t make_random_int(void)
   if(!(random_int=malloc(sizeof(arch_record_t) + sizeof(long)))) {
     return ARCH_UUID_NIL;
   }
-  memset(random_int, 0, sizeof(arch_record_t));
-  random_int->id = arch_uuid_gen();
+  _arch_record_init(random_int, ARCH_UUID_NIL, ARCH_UUID_NIL, &record_getter);
   random_int->width = sizeof(long);
   random_int->size = 1;
   random_int->type = ARCH_TYPE_DATUM;
@@ -105,7 +104,7 @@ int main(int argc, char *argv[]) {
     entries = entry;
   }
   printf("Attempting to create table: ");
-  arch_record_t *table = arch_table_create(entries, false, &record_getter);
+  arch_record_t *table = arch_table_create(entries, false, ARCH_UUID_NIL, ARCH_UUID_NIL, &record_getter);
   if(!table) {
     err(EX_SOFTWARE, "failed to create table");
   }
@@ -142,7 +141,7 @@ int main(int argc, char *argv[]) {
   }
 
   printf("Attempting to create table: ");
-  table = arch_table_create(entries, false, &record_getter);
+  table = arch_table_create(entries, false, old_table, ARCH_UUID_NIL, &record_getter);
   if(!table) {
     err(EX_SOFTWARE, "failed to create table");
   }
@@ -150,8 +149,6 @@ int main(int argc, char *argv[]) {
 
   entries = arch_table_proto_destroy(entries);
   printf("Freed proto-entries.\n");
-
-  table->ancestor = old_table;
 
   for(int i = 0; i < KEYS; i++) {
     arch_record_t *record = record_getter(keys[i]);

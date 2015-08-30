@@ -95,3 +95,25 @@ bool arch_cache_set(arch_cache_t *cache, arch_record_t *record)
   
   return true;
 }
+
+void arch_cache_invalidate(arch_cache_t *cache, arch_record_t *record)
+{
+  arch_cache_bucket_t **last_link = _arch_cache_get_slot(cache, record->id);
+  
+  if(*last_link) {
+    arch_cache_bucket_t *bucket = *last_link;
+    while(bucket->next) {
+      if(arch_uuid_eq(record->id, bucket->uuid)) {
+	*last_link = bucket->next;
+	free(bucket);
+	cache->entries--;
+	break;
+      }
+    }
+    if(!bucket->next && cache->old) {
+      arch_cache_invalidate(cache->old, record);
+    }
+  }
+
+  return;
+}

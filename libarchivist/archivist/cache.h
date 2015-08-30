@@ -20,4 +20,5 @@ typedef struct arch_cache {
 
 arch_record_t *arch_cache_get(arch_cache_t *cache, arch_uuid_t uuid);
 bool arch_cache_set(arch_cache_t *cache, arch_record_t *record);
+void arch_cache_invalidate(arch_cache_t *cache, arch_record_t *record);
 #endif

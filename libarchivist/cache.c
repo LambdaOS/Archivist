@@ -14,7 +14,11 @@ arch_cache_t *arch_cache_create(arch_size_t elts)
   arch_size_t size = arch_hash_size(elts);
   arch_size_t bytes = sizeof(arch_cache_t) + sizeof(arch_cache_bucket_t *) * size;
   arch_cache_t *cache;
-  
+
+  if(!elts) {
+    errno = EINVAL;
+    return NULL;
+  }
   if(bytes > SIZE_MAX || !(cache = malloc((size_t)bytes))) {
     errno = ENOMEM;
     return NULL;
@@ -22,6 +26,17 @@ arch_cache_t *arch_cache_create(arch_size_t elts)
   memset(cache, 0, bytes);
   cache->size = size;
 
+  return cache;
+}
+
+arch_cache_t *arch_cache_grow(arch_cache_t *cache)
+{
+  arch_cache_t *new = arch_cache_create(cache->size << 1);
+  if(new) {
+    new->old = cache;
+    return new;
+  }
+  
   return cache;
 }
 

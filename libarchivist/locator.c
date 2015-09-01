@@ -57,7 +57,7 @@ bool _arch_locator_rehash(arch_locator_t *locator, arch_size_t index)
 arch_size_t arch_locator_get(arch_locator_t *locator, arch_uuid_t uuid)
 {
   arch_hash_t hash_mask = ARCH_HASH_MASK(locator->size);
-  while(hash_mask >= ARCH_LOCATOR_MIN) {
+  while(hash_mask >= ARCH_LOCATOR_MIN_MASK) {
     size_t index = (arch_hash_uuid(uuid) & hash_mask);
     while(index) {
       if(arch_uuid_eq(locator->slots[index].uuid, uuid)) {
@@ -79,23 +79,27 @@ arch_size_t arch_locator_get(arch_locator_t *locator, arch_uuid_t uuid)
 bool arch_locator_set(arch_locator_t *locator, arch_uuid_t uuid, arch_size_t offset)
 {
   arch_size_t index = (arch_hash_uuid(uuid) & ARCH_HASH_MASK(locator->size));
-  if(!ARCH_UUID_IS_NIL(locator->slots[index].uuid)) {
-    while(locator->slots[index].next) {
-      index = locator->slots[index].next;
+  if(!arch_uuid_eq(locator->slots[index].uuid, uuid)) {
+    if(!ARCH_UUID_IS_NIL(locator->slots[index].uuid)) {
+      while(locator->slots[index].next) {
+	index = locator->slots[index].next;
+      }
+      arch_size_t collision_index = 0;
+      while(!ARCH_UUID_IS_NIL(locator->slots[collision_index].uuid) && (collision_index < locator->size)) {
+	collision_index++;
+      }
+      if(collision_index == locator->size) {
+	return false;
+      } else {
+	locator->slots[index].next = collision_index;
+	index = collision_index;
+      }
     }
-    arch_size_t collision_index = 0;
-    while(!ARCH_UUID_IS_NIL(locator->slots[collision_index].uuid) && (collision_index < locator->size)) {
-      collision_index++;
-    }
-    if(collision_index == locator->size) {
-      return false;
-    } else {
-      locator->slots[index].next = collision_index;
-      index = collision_index;
-    }
+    locator->entries++;
+    locator->slots[index].next = 0;
   }
-  locator->slots[index] = (arch_locator_bucket_t){ uuid, offset, 0 };
-  locator->entries++;
+  locator->slots[index].uuid = uuid;
+  locator->slots[index].offset = offset;
 
   return true;
 }

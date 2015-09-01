@@ -57,7 +57,7 @@ bool _arch_locator_rehash(arch_locator_t *locator, arch_size_t index)
 arch_size_t arch_locator_get(arch_locator_t *locator, arch_uuid_t uuid)
 {
   arch_hash_t hash_mask = ARCH_HASH_MASK(locator->size);
-  while(hash_mask >= ARCH_LOCATOR_MIN) {
+  while(hash_mask >= ARCH_LOCATOR_MIN_MASK) {
     size_t index = (arch_hash_uuid(uuid) & hash_mask);
     while(index) {
       if(arch_uuid_eq(locator->slots[index].uuid, uuid)) {

@@ -3,7 +3,9 @@
 #include "record.h"
 #include "uuid.h"
 
-#define ARCH_LOCATOR_MIN 255
+#define ARCH_LOCATOR_MIN 256
+#define ARCH_LOCATOR_MIN_MASK ARCH_HASH_MASK(ARCH_LOCATOR_MIN)
+#define ARCH_LOCATOR_BYTES(size) (sizeof(arch_locator_t) + sizeof(arch_locator_bucket_t) * size)
 typedef struct {
   arch_uuid_t uuid;
   arch_size_t offset, next;

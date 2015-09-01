@@ -33,6 +33,9 @@ typedef struct {
 } __attribute__((packed)) arch_record_t;
 // ^ Eww, compiler dependence. Guess it had to happen somewhere.
 
+#define ARCH_IS(type_name, record) (record->type == ARCH_TYPE_##type_name)
+#define ARCH_RECORD_BYTES(record) ((arch_size_t)(sizeof(arch_record_t) + record->size * record->width))
+
 extern const arch_record_t arch_record_nil;
 
 typedef arch_record_t *(*arch_record_getter_t)(arch_uuid_t);
@@ -56,6 +59,4 @@ static inline bool arch_record_eql(arch_record_t *record1, arch_record_t *record
 
 /* This is defined in a header for use by other modules in the library. It is not meant to be a client API */
 arch_record_t *_arch_record_init(arch_record_t *record, arch_uuid_t ancestor, arch_uuid_t parents, arch_record_getter_t getter);
-
-#define ARCH_IS(type_name, record) (record->type == ARCH_TYPE_##type_name)
 #endif
